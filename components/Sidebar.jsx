@@ -1,8 +1,9 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Package, Zap } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, Users, Package, Zap, Sun, Moon, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useTheme } from './ThemeProvider'
 
 const nav = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -11,7 +12,9 @@ const nav = [
 ]
 
 export default function Sidebar() {
-  const pathname = usePathname()
+  const pathname  = usePathname()
+  const router    = useRouter()
+  const { theme, toggle } = useTheme()
   const [botOnline, setBotOnline] = useState(null)
 
   useEffect(() => {
@@ -27,10 +30,18 @@ export default function Sidebar() {
     return () => clearInterval(t)
   }, [])
 
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/login')
+  }
+
   return (
     <aside style={{
-      width: 220, background: 'var(--surface)', borderRight: '1px solid var(--border)',
-      display: 'flex', flexDirection: 'column', flexShrink: 0, height: '100%'
+      width: 220,
+      background: 'var(--surface)',
+      borderRight: '1px solid var(--border)',
+      display: 'flex', flexDirection: 'column', flexShrink: 0, height: '100%',
+      transition: 'background 0.2s, border-color 0.2s'
     }}>
       {/* Logo */}
       <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--border)' }}>
@@ -59,26 +70,53 @@ export default function Sidebar() {
               <Icon size={16} style={{ opacity: active ? 1 : 0.7 }} />
               {label}
               {href === '/leads' && (
-                <span style={{
-                  marginLeft: 'auto', fontSize: '0.65rem', background: 'var(--accent-2)',
-                  color: 'var(--accent)', padding: '1px 6px', borderRadius: 99, fontWeight: 600
-                }}>Live</span>
+                <span style={{ marginLeft: 'auto', fontSize: '0.65rem', background: 'var(--accent-2)', color: 'var(--accent)', padding: '1px 6px', borderRadius: 99, fontWeight: 600 }}>Live</span>
               )}
             </Link>
           )
         })}
       </nav>
 
-      {/* Bot status */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {botOnline === null
-            ? <div style={{ width:8,height:8,borderRadius:'50%',background:'var(--text-3)' }} />
-            : botOnline
-              ? <div className="pulse-dot" />
-              : <div style={{ width:8,height:8,borderRadius:'50%',background:'var(--hot)' }} />
+      {/* Bottom */}
+      <div style={{ padding: '10px', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {/* Theme toggle */}
+        <button onClick={toggle}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 9, width: '100%',
+            padding: '7px 10px', borderRadius: 8, background: 'none',
+            border: '1px solid var(--border)', cursor: 'pointer',
+            color: 'var(--text-2)', fontSize: '0.82rem', transition: 'all 0.15s'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-2)' }}>
+          {theme === 'dark'
+            ? <><Sun size={14} /> Light mode</>
+            : <><Moon size={14} /> Dark mode</>
           }
-          <span style={{ fontSize: '0.78rem', color: 'var(--text-2)' }}>
+        </button>
+
+        {/* Logout */}
+        <button onClick={logout}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 9, width: '100%',
+            padding: '7px 10px', borderRadius: 8, background: 'none',
+            border: 'none', cursor: 'pointer',
+            color: 'var(--text-3)', fontSize: '0.82rem', transition: 'all 0.15s'
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--hot)' }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)' }}>
+          <LogOut size={14} /> Sign out
+        </button>
+
+        {/* Bot status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 10px' }}>
+          {botOnline === null
+            ? <div style={{ width:6,height:6,borderRadius:'50%',background:'var(--text-3)' }} />
+            : botOnline
+              ? <div className="pulse-dot" style={{ width:6,height:6 }} />
+              : <div style={{ width:6,height:6,borderRadius:'50%',background:'var(--hot)' }} />
+          }
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-3)' }}>
             Omar · {botOnline === null ? 'checking' : botOnline ? 'online' : 'offline'}
           </span>
         </div>

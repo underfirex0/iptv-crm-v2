@@ -14,18 +14,18 @@ export default async function LeadDetailPage({ params }) {
   if (!lead) notFound()
 
   const infoItems = [
-    { icon: Phone,    label: 'Phone',    value: lead.phone },
-    { icon: MapPin,   label: 'City',     value: lead.city || '—' },
-    { icon: Monitor,  label: 'Device',   value: lead.device_type || '—' },
-    { icon: Tv,       label: 'Channels', value: lead.channel_interest || '—' },
-    { icon: Camera,   label: 'Photo',    value: lead.photo_sent ? '✓ Sent' : 'Not sent' },
+    { icon: Phone,   label: 'Phone',    value: lead.phone },
+    { icon: MapPin,  label: 'City',     value: lead.city || '—' },
+    { icon: Monitor, label: 'Device',   value: lead.device_type || '—' },
+    { icon: Tv,      label: 'Channels', value: lead.channel_interest || '—' },
+    { icon: Camera,  label: 'Photo',    value: lead.photo_sent ? '✓ Sent' : 'Not sent' },
   ]
 
   return (
     <div className="fade-up" style={{ padding: '2rem', maxWidth: 1400 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: '1.75rem' }}>
-        <Link href="/leads" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-3)', fontSize: '0.85rem', textDecoration: 'none', transition: 'color 0.15s' }}>
+        <Link href="/leads" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-3)', fontSize: '0.85rem', textDecoration: 'none' }}>
           <ArrowLeft size={15} /> Back
         </Link>
         <div style={{ width: 1, height: 18, background: 'var(--border)' }} />
@@ -60,8 +60,7 @@ export default async function LeadDetailPage({ params }) {
             </div>
             {lead.wants_test && (
               <div style={{ marginTop: 12, padding: '8px 12px', background: 'var(--warm-bg)', borderRadius: 8, fontSize: '0.8rem', color: 'var(--warm)' }}>
-                🧪 Requested 1-hour test
-                {lead.test_sent && ' · ✓ Sent'}
+                🧪 Requested 1-hour test {lead.test_sent && '· ✓ Sent'}
               </div>
             )}
             {lead.revenue > 0 && (
@@ -70,8 +69,6 @@ export default async function LeadDetailPage({ params }) {
               </div>
             )}
           </div>
-
-          {/* Edit form */}
           <LeadEditForm lead={lead} packages={packages} />
         </div>
 
@@ -81,7 +78,7 @@ export default async function LeadDetailPage({ params }) {
             <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-2)' }}>Conversation</p>
             <span style={{ fontSize: '0.72rem', color: 'var(--text-3)' }}>{messages.length} messages</span>
           </div>
-          <ConversationView messages={messages} />
+          <ConversationView messages={messages} leadId={id} phone={lead.phone} />
         </div>
       </div>
     </div>
